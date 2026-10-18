@@ -341,6 +341,9 @@ function Add-PC5BootEntry([string] $Letter, [bool] $MakeDefault) {
     $new = $after | Where-Object { $before -notcontains $_.id } | Select-Object -First 1
     if (-not $new) { $new = $after | Where-Object { $_.device -ieq "partition=$($Letter):" } | Select-Object -First 1 }
     if (-not $new) { throw 'The boot entry for PC5 OS could not be found after bcdboot.' }
+    # Never rename or touch the entry of the Windows that is running now.
+    $current = [regex]::Match((Invoke-PC5Native 'bcdedit.exe' @('/enum', '{current}', '/v')), '\{[0-9a-fA-F-]{36}\}').Value.ToLowerInvariant()
+    if ($current -and $new.id -eq $current) { throw 'bcdboot changed the running Windows'' boot entry instead of adding one. Nothing was renamed.' }
     Invoke-PC5Native 'bcdedit.exe' @('/set', $new.id, 'description', 'PC5 OS') | Out-Null
     if ($MakeDefault) { Invoke-PC5Native 'bcdedit.exe' @('/default', $new.id) | Out-Null }
     Invoke-PC5Native 'bcdedit.exe' @('/timeout', '5') | Out-Null

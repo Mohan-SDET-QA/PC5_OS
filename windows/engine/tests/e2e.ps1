@@ -7,8 +7,11 @@ param([Parameter(Mandatory)] [string] $Iso, [ValidateSet('partition', 'iso')] [s
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot '..\PC5Engine.psm1') -Force -DisableNameChecking
 $script:failed = 0
-function Check([string] $Name, [bool] $Ok) {
-    if ($Ok) { Write-Host "ok   $Name" -ForegroundColor Green; Write-Host "::notice::ok: $Name" } else { Write-Host "::error::FAIL: $Name"; $script:failed++ }
+$script:passed = New-Object System.Collections.ArrayList
+# GitHub shows only 10 annotations of each kind per step: passes are summed up in one.
+function Check([string] $Name, [bool] $Ok, [string] $Detail = '') {
+    if ($Ok) { Write-Host "ok   $Name" -ForegroundColor Green; [void]$script:passed.Add($Name) }
+    else { Write-Host "::error::FAIL: $Name $Detail"; $script:failed++ }
 }
 
 try {
@@ -17,6 +20,7 @@ $last = @{ p = -10 }
 $emit = {
     param($e)
     if ($e.kind -eq 'step') { Write-Host "==> $($e.label)" -ForegroundColor Cyan }
+    elseif ($e.kind -eq 'log' -and ($e.level -eq 'warn' -or $e.level -eq 'error')) { Write-Host "::warning::$($e.text)" }
     elseif ($e.kind -eq 'log' -and $e.level -ne 'step') { Write-Host "    [$($e.level)] $($e.text)" }
     elseif ($e.kind -eq 'progress' -and $e.percent -ge $last.p + 10) { $last.p = $e.percent; Write-Host "    $($e.percent)%" }
 }.GetNewClosure()
@@ -79,7 +83,9 @@ if ($Target -eq 'partition') {
 
     if ($targets.firmware -eq 'UEFI') {
         $defaultBefore = [regex]::Match((bcdedit /enum '{default}' /v | Out-String), '\{[0-9a-f-]{36}\}').Value
+        $current = [regex]::Match((bcdedit /enum '{current}' /v | Out-String), '\{[0-9a-f-]{36}\}').Value
         $entry = Add-PC5BootEntry $r.letter $false
+        Check 'new boot entry is not the running Windows' ($entry -ne $current) "(entry $entry, current $current)"
         $text = bcdedit /enum $entry | Out-String
         Check 'boot entry is called PC5 OS' ($text -match 'PC5 OS')
         $defaultAfter = [regex]::Match((bcdedit /enum '{default}' /v | Out-String), '\{[0-9a-f-]{36}\}').Value
@@ -89,9 +95,10 @@ if ($Target -eq 'partition') {
         Check 'install is listed' (@(Get-PC5Installs | Where-Object { $_.entryId -eq $entry -and $_.healthy }).Count -eq 1)
         Remove-PC5Install $entry | Out-Null
         Check 'remove deletes the partition' (-not (Get-Partition | Where-Object { $_.Guid -eq $part.Guid }))
-        $gone = $false
-        try { bcdedit /enum $entry | Out-Null; $gone = $LASTEXITCODE -ne 0 } catch { $gone = $true }
-        Check 'remove deletes the boot entry' $gone
+        $after = (& bcdedit.exe /enum $entry 2>&1 | Out-String).Trim()
+        $code = $LASTEXITCODE
+        $stillListed = (& bcdedit.exe /enum osloader /v | Out-String) -match [regex]::Escape($entry)
+        Check 'remove deletes the boot entry' (-not $stillListed) "(enum exit $code, output: $($after -replace '\s+', ' '))"
     } else { Write-Host 'This machine boots BIOS: boot-menu checks skipped.' -ForegroundColor Yellow }
 } else {
     $out = Join-Path $Work 'out\PC5-OS.iso'
@@ -115,5 +122,6 @@ if ($Target -eq 'partition') {
     Write-Host "::error::$($_.Exception.Message) (line $($_.InvocationInfo.ScriptLineNumber): $($_.InvocationInfo.Line.Trim()))"
     exit 1
 }
+Write-Host "::notice::passed $($script:passed.Count): $($script:passed -join '; ')"
 if ($script:failed) { Write-Host "::error::$script:failed checks failed"; exit 1 }
 Write-Host 'end-to-end test passed' -ForegroundColor Green
