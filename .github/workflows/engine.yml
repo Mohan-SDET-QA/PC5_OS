@@ -50,7 +50,7 @@ jobs:
         run: Get-Volume | Where-Object DriveLetter | Format-Table DriveLetter, FileSystemLabel, @{n='FreeGB';e={[int]($_.SizeRemaining/1GB)}}, @{n='SizeGB';e={[int]($_.Size/1GB)}}
       - name: Download a Windows 11 ISO
         shell: powershell
-        run: ./windows/engine/tests/get-test-iso.ps1 -Out C:\pc5-iso\windows.iso -Url '${{ inputs.iso_url }}'
+        run: ./windows/engine/tests/get-test-iso.ps1 -Out D:\pc5-iso\windows.iso -Url '${{ inputs.iso_url }}'
       - name: Build PC5 OS (${{ matrix.target }})
         shell: powershell
-        run: ./windows/engine/tests/e2e.ps1 -Iso C:\pc5-iso\windows.iso -Target ${{ matrix.target }}
+        run: ./windows/engine/tests/e2e.ps1 -Iso D:\pc5-iso\windows.iso -Target ${{ matrix.target }} -Work D:\pc5-test

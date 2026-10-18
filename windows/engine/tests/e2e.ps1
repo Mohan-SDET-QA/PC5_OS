@@ -3,7 +3,7 @@
 #              then checks the files, removed apps, registry, the boot entry
 #              (when the machine boots UEFI) and Remove.
 #   iso:       builds a PC5 OS ISO and checks what is inside it.
-param([Parameter(Mandatory)] [string] $Iso, [ValidateSet('partition', 'iso')] [string] $Target = 'partition')
+param([Parameter(Mandatory)] [string] $Iso, [ValidateSet('partition', 'iso')] [string] $Target = 'partition', [string] $Work = 'C:\pc5-test')
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot '..\PC5Engine.psm1') -Force -DisableNameChecking
 $script:failed = 0
@@ -23,7 +23,8 @@ $emit = {
 (Get-Module PC5Engine).SessionState.PSVariable.Set('Emit', $emit)
 
 # Stand-in for the PC5 app files (the real ones come from the installed app).
-$app = 'C:\pc5-test-app'
+New-Item -ItemType Directory -Force -Path $Work | Out-Null
+$app = Join-Path $Work 'app'
 New-Item -ItemType Directory -Force -Path "$app\resources" | Out-Null
 Copy-Item "$env:WINDIR\System32\notepad.exe" "$app\PC5Shell.exe"
 Set-Content "$app\resources\marker.txt" 'pc5'
@@ -40,10 +41,10 @@ $targets = Invoke-PC5Command 'targets' $null
 Write-Host "Firmware: $($targets.firmware); drives: $(@($targets.drives | ForEach-Object { $_.letter }) -join ', ')"
 
 if ($Target -eq 'partition') {
-    $vhd = 'C:\pc5-test.vhdx'
+    $vhd = Join-Path $Work 'pc5-test.vhdx'
     Remove-Item $vhd -ErrorAction SilentlyContinue
-    "create vdisk file=$vhd maximum=65536 type=expandable`nattach vdisk`nconvert gpt" | Set-Content C:\pc5-diskpart.txt -Encoding ASCII
-    diskpart /s C:\pc5-diskpart.txt | Out-Host
+    "create vdisk file=$vhd maximum=65536 type=expandable`nattach vdisk`nconvert gpt" | Set-Content (Join-Path $Work 'diskpart.txt') -Encoding ASCII
+    diskpart /s (Join-Path $Work 'diskpart.txt') | Out-Host
     $disk = Get-Disk | Where-Object { $_.Location -like '*pc5-test.vhdx*' } | Select-Object -First 1
     Check 'test disk attached' ([bool]$disk)
 
@@ -93,10 +94,10 @@ if ($Target -eq 'partition') {
         Check 'remove deletes the boot entry' $gone
     } else { Write-Host 'This machine boots BIOS: boot-menu checks skipped.' -ForegroundColor Yellow }
 } else {
-    $out = 'C:\pc5-out\PC5-OS.iso'
+    $out = Join-Path $Work 'out\PC5-OS.iso'
     $spec = [pscustomobject]@{
         target = 'iso'; iso = $Iso; imageIndex = $image.index; items = $items; userName = 'Player'; isoOut = $out
-        locale = 'en-US'; timeZone = 'Pacific Standard Time'; shellDir = $app; version = '0.0.0-test'; bypassChecks = $true; workDir = 'C:\PC5Build'
+        locale = 'en-US'; timeZone = 'Pacific Standard Time'; shellDir = $app; version = '0.0.0-test'; bypassChecks = $true; workDir = (Join-Path $Work 'build')
     }
     $r = Invoke-PC5Build $spec
     Check 'ISO was written' ((Test-Path $out) -and (Get-Item $out).Length -gt 2GB)
@@ -107,7 +108,7 @@ if ($Target -eq 'partition') {
         Check 'ISO has install.wim, boot files and autounattend.xml' ((Test-Path "$d\sources\install.wim") -and (Test-Path "$d\efi\microsoft\boot\efisys.bin") -and (Test-Path "$d\autounattend.xml"))
         Check 'ISO has one edition' (@(Get-WindowsImage -ImagePath "$d\sources\install.wim").Count -eq 1)
     } finally { Dismount-DiskImage -ImagePath $out | Out-Null }
-    Check 'temporary files cleaned up' (-not (Test-Path 'C:\PC5Build'))
+    Check 'temporary files cleaned up' (-not (Test-Path (Join-Path $Work 'build')))
 }
 
 } catch {
