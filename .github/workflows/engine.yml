@@ -28,7 +28,11 @@ jobs:
         run: ./windows/engine/tests/engine.tests.ps1
       - name: What the installer sees on this PC
         shell: powershell
-        run: ./windows/engine/pc5-engine.ps1 -Command targets
+        run: |
+          $r = ./windows/engine/pc5-engine.ps1 -Command targets | Select-Object -Last 1 | ConvertFrom-Json
+          if (-not $r.ok) { Write-Host "::error::targets failed: $($r.error)"; exit 1 }
+          $d = $r.data
+          Write-Host "::notice::firmware=$($d.firmware) secureBoot=$($d.secureBoot) locale=$($d.locale) tz=$($d.timeZone) drives=$(@($d.drives | ForEach-Object { '{0}: {1}GB free, max {2}GB, usable={3} {4}' -f $_.letter, [int]($_.free/1GB), $_.maxSizeGB, $_.usable, $_.reason }) -join ' | ') disks=$(@($d.disks).Count) usb=$(@($d.usb).Count)"
 
   e2e:
     needs: unit

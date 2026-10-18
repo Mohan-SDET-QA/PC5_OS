@@ -8,9 +8,10 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot '..\PC5Engine.psm1') -Force -DisableNameChecking
 $script:failed = 0
 function Check([string] $Name, [bool] $Ok) {
-    if ($Ok) { Write-Host "ok   $Name" -ForegroundColor Green } else { Write-Host "FAIL $Name" -ForegroundColor Red; $script:failed++ }
+    if ($Ok) { Write-Host "ok   $Name" -ForegroundColor Green; Write-Host "::notice::ok: $Name" } else { Write-Host "::error::FAIL: $Name"; $script:failed++ }
 }
 
+try {
 # Quieter event output: steps, warnings and every 10%.
 $last = @{ p = -10 }
 $emit = {
@@ -109,5 +110,9 @@ if ($Target -eq 'partition') {
     Check 'temporary files cleaned up' (-not (Test-Path 'C:\PC5Build'))
 }
 
-if ($script:failed) { throw "$script:failed checks failed" }
+} catch {
+    Write-Host "::error::$($_.Exception.Message) (line $($_.InvocationInfo.ScriptLineNumber): $($_.InvocationInfo.Line.Trim()))"
+    exit 1
+}
+if ($script:failed) { Write-Host "::error::$script:failed checks failed"; exit 1 }
 Write-Host 'end-to-end test passed' -ForegroundColor Green
