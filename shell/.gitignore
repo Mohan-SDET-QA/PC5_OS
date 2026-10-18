@@ -1,0 +1,4 @@
+node_modules/
+dist/
+helper/bin/
+*.iso

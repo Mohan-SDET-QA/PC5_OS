@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PC5 OS</title>
+  <meta name="description" content="Turn a Windows PC into a game console. PC5 OS is a controller-first console interface for Windows: your Steam, Epic and GOG games in one place, free games, downloads and the full Windows desktop when you want it.">
+  <meta property="og:title" content="PC5 OS: your PC, as a console">
+  <meta property="og:description" content="A controller-first console interface for Windows. Try it in your browser.">
+  <meta property="og:image" content="/img/themes.jpg">
+  <meta name="theme-color" content="#060914">
+  <link rel="icon" href="/icon.png">
+  <link rel="stylesheet" href="/site.css">
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <header class="top">
+    <a class="brand" href="/"><img src="/icon.png" alt="" width="32" height="32"><span>PC<b>5</b> OS</span></a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn small" href="/play/">Try it</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">For Windows 10 and 11 · Free</p>
+      <h1>Your PC, <span class="grad">as a console.</span></h1>
+      <p class="lede">PC5 OS turns your gaming PC into a living-room console. Pick up a PlayStation or Xbox controller and every game, store and download is right there, with the full Windows desktop one button away.</p>
+      <div class="cta">
+        <a class="btn primary" href="/play/">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+          Try it in your browser
+        </a>
+        <a class="btn" id="download" href="{{DOWNLOAD_URL}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download for Windows
+        </a>
+      </div>
+      <p class="fine">Version {{VERSION}} · {{SIZE}} · No account needed</p>
+      <a class="tv" href="/play/" aria-label="Open the live preview">
+        <iframe src="/play/?embed" title="The PC5 OS home screen, playing live" tabindex="-1" aria-hidden="true"></iframe>
+        <span class="play-badge">This is the real interface. Click to try it.</span>
+      </a>
+    </section>
+
+    <section id="features" class="features">
+      <h2>Everything a console does. Everything a PC can.</h2>
+      <div class="grid">
+        <article><h3>Controller first</h3><p>PS5 DualSense, PS4 DualShock and Xbox controllers work from the first boot, wired or Bluetooth. No keyboard or mouse needed, ever.</p></article>
+        <article><h3>All your games</h3><p>Steam, Epic, GOG and games you installed yourself appear together on Home, with their artwork, automatically.</p></article>
+        <article><h3>Free games</h3><p>Current giveaways and free-to-play games from the big stores, one press from Home.</p></article>
+        <article><h3>Downloads built in</h3><p>A web browser you drive with the controller and a torrent downloader. Installers and archives become games in your library.</p></article>
+        <article><h3>Performance monitor</h3><p>Live CPU, GPU, memory and temperatures, an in-game overlay, and End task for anything that hangs.</p></article>
+        <article><h3>Make it yours</h3><p>Nine themes, your own wallpaper, navigation sounds and startup music.</p></article>
+      </div>
+      <div class="shots">
+        <figure><img src="/img/performance.jpg" alt="Performance monitor with live charts for processor, graphics and memory" loading="lazy" width="1920" height="1080"><figcaption>Performance monitor</figcaption></figure>
+        <figure><img src="/img/themes.jpg" alt="Theme picker in Settings" loading="lazy" width="1920" height="1080"><figcaption>Themes</figcaption></figure>
+        <figure><img src="/img/downloads.jpg" alt="Downloads page with a torrent and a web download" loading="lazy" width="1920" height="1080"><figcaption>Downloads</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="install" class="install">
+      <h2>Install in three steps</h2>
+      <ol class="steps">
+        <li><span>1</span><div><h3>Download</h3><p>Get <b>PC5-OS-Setup.exe</b> with the button above.</p></div></li>
+        <li><span>2</span><div><h3>Run Setup</h3><p>Double-click it. If Windows says <i>“Windows protected your PC”</i>, choose <b>More info → Run anyway</b>. That message appears for any new app that isn't code-signed yet.</p></div></li>
+        <li><span>3</span><div><h3>Pick how it starts</h3><p><b>Console mode</b> starts PC5 instead of the desktop when you sign in. <b>App mode</b> opens it like any other app. Change it any time in Settings → System.</p></div></li>
+      </ol>
+      <div class="req">
+        <div><h3>You need</h3><p>Windows 10 or 11 (64-bit) · 4 GB RAM · a controller (optional: keyboard and mouse work too)</p></div>
+        <a class="btn primary" href="{{DOWNLOAD_URL}}">Download PC5 OS</a>
+      </div>
+    </section>
+
+    <section id="faq" class="faq">
+      <h2>Questions</h2>
+      <details><summary>Does it replace Windows?</summary><p>No. PC5 OS runs on top of your existing Windows. Your files, apps and games stay exactly where they are.</p></details>
+      <details><summary>How do I get back to the normal desktop?</summary><p>Settings → System → <b>Desktop Mode</b> opens the desktop right away (the PS button brings you back). <b>Switch to Windows</b> signs you in to the regular desktop until you choose to return.</p></details>
+      <details><summary>How do I uninstall it?</summary><p>Windows Settings → Apps → PC5 OS → Uninstall. If console mode was on, the uninstaller switches your PC back to the normal desktop.</p></details>
+      <details><summary>Do my PlayStation controllers work in every game?</summary><p>PC5 adds the games you install yourself to Steam, so Steam Input translates your PlayStation controller for games that only understand Xbox controllers.</p></details>
+      <details><summary>Is it free?</summary><p>Yes. Store games are bought or claimed through their own stores (Steam, Epic, GOG).</p></details>
+    </section>
+  </main>
+
+  <footer>
+    <p>PC5 OS is an independent project. It is not affiliated with, endorsed by or connected to Sony Interactive Entertainment, Microsoft, Valve or Epic Games. PlayStation, DualSense, Xbox, Windows, Steam and Epic Games are trademarks of their owners. Download only content you have the right to.</p>
+  </footer>
+</body>
+</html>

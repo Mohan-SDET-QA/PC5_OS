@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' https: data: file:; media-src 'self' file: data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'">
+  <title>PC5</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Background: game art crossfade over a slowly moving aurora -->
+  <div id="bg">
+    <div class="aurora"><span></span><span></span><span></span></div>
+    <div class="wallpaper" id="wallpaper"></div>
+    <div class="bg-layer" id="bg-a"></div><div class="bg-layer" id="bg-b"></div>
+    <div class="bg-shade"></div>
+  </div>
+
+  <div id="app">
+    <header id="topbar">
+      <nav class="tabs" data-nav-group="tabs">
+        <button class="tab" data-nav data-view="games">Games</button>
+        <button class="tab" data-nav data-view="media">Media</button>
+      </nav>
+      <div class="status" data-nav-group="status">
+        <button class="icon-btn" data-nav id="btn-search" title="Search"><i data-icon="search"></i></button>
+        <button class="icon-btn" data-nav id="btn-downloads" title="Downloads"><i data-icon="download"></i><span class="badge" id="dl-badge" hidden></span></button>
+        <button class="icon-btn" data-nav data-view="settings" title="Settings"><i data-icon="settings"></i></button>
+        <button class="icon-btn avatar-btn" data-nav id="btn-profile" title="Profile"><span class="avatar" id="avatar">P</span></button>
+        <div class="clock" id="clock">--:--</div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Home: Games -->
+      <section class="view home" id="view-games">
+        <div class="home-scroll">
+          <div class="tile-row" id="game-row" data-nav-group="game-row"></div>
+          <div class="hero-info">
+            <div class="meta" id="game-meta"></div>
+            <img class="hero-logo" id="game-logo" alt="" hidden>
+            <h1 id="game-title"></h1>
+            <p class="hero-desc" id="game-desc"></p>
+            <div class="actions" data-nav-group="game-actions">
+              <button class="btn primary" data-nav data-nav-default id="btn-play">Play</button>
+              <button class="btn round" data-nav id="btn-game-opts" title="Options"><i data-icon="more"></i></button>
+            </div>
+          </div>
+          <div class="hub">
+            <h3 class="hub-title">For you</h3>
+            <div class="hub-cards" id="games-hub" data-nav-group="games-hub"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Home: Media -->
+      <section class="view home" id="view-media" hidden>
+        <div class="home-scroll">
+          <div class="tile-row" id="media-row" data-nav-group="media-row"></div>
+          <div class="hero-info">
+            <div class="meta" id="media-meta"></div>
+            <h1 id="media-title"></h1>
+            <p class="hero-desc" id="media-desc"></p>
+            <div class="actions" data-nav-group="media-actions">
+              <button class="btn primary" data-nav data-nav-default id="btn-media-open">Open</button>
+            </div>
+          </div>
+          <div class="hub">
+            <h3 class="hub-title">Free game sites</h3>
+            <div class="hub-cards" id="media-hub" data-nav-group="media-hub"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pages (opened from tiles; Circle/B goes back) -->
+      <section class="view page" id="view-store" hidden>
+        <div class="store-scroll scroll-area" id="store-scroll">
+          <div class="store-head" data-nav-group="store-head">
+            <h2 class="page-title"><i data-icon="store"></i> Store</h2>
+            <button class="chip" data-nav id="btn-store-search"><i data-icon="search"></i> Search Steam</button>
+            <button class="chip" data-nav id="btn-store-web"><i data-icon="globe"></i> Free game sites</button>
+            <button class="chip" data-nav id="btn-open-bp"><i data-icon="tv"></i> Steam Big Picture</button>
+            <button class="chip" data-nav id="btn-open-epic"><i data-icon="diamond"></i> Epic Games</button>
+          </div>
+          <div id="store-feature" data-nav-group="store-feature"></div>
+          <div id="store-rows"><p class="muted loading-line"><span class="spinner small"></span> Loading the store…</p></div>
+        </div>
+      </section>
+
+      <section class="view page" id="view-library" hidden>
+        <div class="page-head" data-nav-group="lib-head">
+          <h2 class="page-title"><i data-icon="library"></i> Game Library <span class="muted count" id="lib-count"></span></h2>
+          <button class="chip" data-nav id="btn-install-file"><i data-icon="download"></i> Install from file</button>
+          <button class="chip" data-nav id="btn-add-game"><i data-icon="plus"></i> Add a game</button>
+          <button class="chip" data-nav id="btn-rescan"><i data-icon="refresh"></i> Rescan</button>
+        </div>
+        <div class="lib-filters" id="lib-filters" data-nav-group="lib-filters"></div>
+        <div class="lib-grid scroll-area" id="lib-grid" data-nav-group="library"></div>
+      </section>
+
+      <section class="view page" id="view-downloads" hidden>
+        <div class="page-head" data-nav-group="dl-head">
+          <h2 class="page-title"><i data-icon="download"></i> Downloads</h2>
+          <button class="chip" data-nav id="btn-dl-browser"><i data-icon="globe"></i> Web Browser</button>
+          <button class="chip" data-nav id="btn-dl-magnet"><i data-icon="magnet"></i> Add torrent link</button>
+          <button class="chip" data-nav id="btn-dl-url"><i data-icon="download"></i> Download a link</button>
+          <button class="chip" data-nav id="btn-dl-folder"><i data-icon="folder"></i> Downloads folder</button>
+        </div>
+        <div class="dl-list scroll-area" id="dl-list" data-nav-group="dl-list"></div>
+      </section>
+
+      <section class="view page" id="view-files" hidden>
+        <div class="page-head">
+          <h2 class="page-title"><i data-icon="folder"></i> Files</h2>
+          <span class="muted path" id="files-path"></span>
+        </div>
+        <div class="file-list scroll-area" id="file-list" data-nav-group="files"></div>
+      </section>
+
+      <section class="view page" id="view-apps" hidden>
+        <div class="page-head">
+          <h2 class="page-title"><i data-icon="grid"></i> Windows Apps</h2>
+        </div>
+        <div class="app-grid scroll-area" id="win-apps" data-nav-group="win-apps"></div>
+      </section>
+
+      <section class="view page" id="view-perf" hidden>
+        <div class="page-head" data-nav-group="perf-head">
+          <h2 class="page-title"><i data-icon="activity"></i> Performance</h2>
+          <button class="chip" data-nav id="perf-overlay"></button>
+          <button class="chip" data-nav id="perf-overlay-pos"><i data-icon="settings"></i> Overlay settings</button>
+          <button class="chip" data-nav id="perf-capture"><i data-icon="camera"></i> Screenshot</button>
+        </div>
+        <div class="perf-scroll scroll-area">
+          <div class="perf-tiles" id="perf-tiles"></div>
+          <div class="perf-procs-head"><span>Busiest apps</span><span>CPU</span><span>Memory</span></div>
+          <div class="perf-procs" id="perf-procs" data-nav-group="perf-procs"></div>
+        </div>
+      </section>
+
+      <section class="view page" id="view-settings" hidden>
+        <div class="page-head">
+          <h2 class="page-title"><i data-icon="settings"></i> Settings</h2>
+        </div>
+        <div class="settings-wrap">
+          <nav class="set-cats" id="set-cats" data-nav-group="set-cats"></nav>
+          <section class="set-panel" id="set-panel"></section>
+        </div>
+      </section>
+    </main>
+
+    <footer id="hints"></footer>
+  </div>
+
+  <!-- Built-in web browser -->
+  <div id="browser" hidden>
+    <div class="browser-bar">
+      <span class="b-ico" id="b-loading"><i data-icon="globe"></i></span>
+      <div class="b-url" id="b-url"></div>
+      <div class="b-hints" id="b-hints"></div>
+    </div>
+    <div class="browser-stage" id="browser-stage">
+      <div id="cursor"></div>
+    </div>
+  </div>
+
+  <!-- Media player (videos, music, pictures) -->
+  <div id="viewer" hidden>
+    <div class="viewer-stage" id="viewer-stage"></div>
+    <div class="viewer-ui">
+      <div class="v-top"><div class="v-title" id="v-title"></div><div class="v-count" id="v-count"></div><button class="v-btn" id="v-close" title="Close"><i data-icon="back"></i></button></div>
+      <div class="v-bottom">
+        <div class="v-progress" id="v-progress"><div class="fill" id="v-progress-fill"></div></div>
+        <div class="v-controls">
+          <button class="v-btn" id="v-prev" title="Previous"><i data-icon="prev"></i></button>
+          <button class="v-btn big" id="v-play" title="Play / pause"><i data-icon="pause"></i></button>
+          <button class="v-btn" id="v-next" title="Next"><i data-icon="next"></i></button>
+          <div class="v-time" id="v-time"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mouse-banner" hidden><i data-icon="mouse"></i> Controller is a mouse · hold <b id="mouse-exit-btn">Create</b> to switch back · PS returns home</div>
+
+  <!-- Startup: particles + logo, then "press the PS button" with the user's profile -->
+  <div id="splash">
+    <canvas id="splash-particles"></canvas>
+    <div class="splash-logo" id="splash-logo">PC<span>5</span></div>
+    <div class="splash-user" id="splash-user" hidden>
+      <div class="splash-welcome">Welcome back</div>
+      <div class="splash-avatar" id="splash-avatar">P</div>
+      <div class="splash-name" id="splash-name">Player</div>
+      <div class="splash-press">Press <span id="splash-glyph"></span> to continue</div>
+    </div>
+  </div>
+
+  <div id="modals"></div>
+  <div id="launch-overlay" hidden><div class="launch-art" id="launch-art"></div><div class="spinner"></div><div id="launch-text"></div></div>
+  <div id="toast" hidden></div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/themes.js"></script>
+  <script src="js/api-stub.js"></script>
+  <script src="js/gamepad.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/osk.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/browser.js"></script>
+  <script src="js/downloads-ui.js"></script>
+  <script src="js/files-ui.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/perf-ui.js"></script>
+  <script src="js/viewer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+const { contextBridge, ipcRenderer } = require('electron');
+
+const call = (channel) => (...args) => ipcRenderer.invoke(channel, ...args);
+// Subscribes to an event from the main process; returns an unsubscribe function.
+const on = (channel) => (fn) => {
+  const listener = (_e, ...args) => fn(...args);
+  ipcRenderer.on(channel, listener);
+  return () => ipcRenderer.removeListener(channel, listener);
+};
+
+contextBridge.exposeInMainWorld('pc5', {
+  env: call('env'),
+  getConfig: call('config:get'),
+  setConfig: call('config:set'),
+  listGames: call('library:list'),
+  addGame: call('library:addGame'),
+  gameFolders: call('library:folders'),
+  scanFolders: call('library:scanFolders'),
+  installGame: call('games:install'),
+  artColor: call('art:color'),
+  winset: call('winset'),
+  switchToWindows: call('shell:switchToWindows'),
+  perfWatch: call('perf:watch'),
+  endTask: call('perf:endTask'),
+  setOverlay: call('overlay:set'),
+  screenshot: call('capture:screenshot'),
+  launchGame: call('game:launch'),
+  launchApp: call('app:launch'),
+  openUri: call('uri:open'),
+  steamFeatured: call('store:steamFeatured'),
+  steamSearch: call('store:steamSearch'),
+  steamFree: call('store:steamFree'),
+  epicFree: call('store:epicFree'),
+  giveaways: call('store:giveaways'),
+  downloads: {
+    list: call('downloads:list'),
+    addUrl: call('downloads:addUrl'),
+    addTorrent: call('downloads:addTorrent'),
+    pause: call('downloads:pause'),
+    resume: call('downloads:resume'),
+    remove: call('downloads:remove'),
+  },
+  files: {
+    list: call('files:list'),
+    open: call('files:open'),
+    rename: call('files:rename'),
+    remove: call('files:remove'),
+    mkdir: call('files:mkdir'),
+    extract: call('files:extract'),
+    findExe: call('files:findExe'),
+    apps: call('files:apps'),
+    icon: call('files:icon'),
+    copy: call('files:copy'),
+  },
+  systemInfo: call('system:info'),
+  wifiList: call('wifi:list'),
+  wifiConnect: call('wifi:connect'),
+  power: call('power'),
+  bootEntries: call('boot:entries'),
+  restartInto: call('boot:restartInto'),
+  restartToFirmware: call('boot:firmware'),
+  btScan: call('bt:scan'),
+  btPair: call('bt:pair'),
+  setMouseMode: call('input:mouse'),
+  openDesktop: call('shell:desktop'),
+  quitShell: call('shell:quit'),
+  onHome: on('home'),
+  onInput: on('input'),
+  onDownloads: on('downloads'),
+  onDownloadDone: on('download-done'),
+  onToast: on('toast'),
+  onLibraryChanged: on('library-changed'),
+  onGameAdded: on('game-added'),
+  onInstallStatus: on('install-status'),
+  onPerf: on('perf'),
+  onCaptured: on('captured'),
+});

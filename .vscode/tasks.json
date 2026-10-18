@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "PC5: Run the app (demo data)", "type": "shell", "command": "npm run demo", "options": { "cwd": "${workspaceFolder}/shell" }, "problemMatcher": [] },
+    { "label": "PC5: Build the Windows installer", "type": "shell", "command": "npm run installer", "options": { "cwd": "${workspaceFolder}/shell" }, "problemMatcher": [], "group": "build" },
+    { "label": "PC5: Preview the website", "type": "shell", "command": "npm install && npm run preview", "options": { "cwd": "${workspaceFolder}/web" }, "problemMatcher": [] },
+    { "label": "PC5: Deploy the website to Vercel", "type": "shell", "command": "npm install && npm run deploy", "options": { "cwd": "${workspaceFolder}/web" }, "problemMatcher": [] }
+  ]
+}

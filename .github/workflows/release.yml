@@ -1,0 +1,49 @@
+# Builds PC5-OS-Setup.exe on a Windows machine and publishes it as a GitHub Release.
+# Start it by pushing a version tag:   git tag v0.1.0 && git push origin v0.1.0
+# (or Actions → Build installer → Run workflow, which builds without publishing).
+name: Build installer
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: shell
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: shell/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Build controller service and installer
+        run: npm run installer
+
+      - name: Keep the installer as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PC5-OS-Setup
+          path: shell/dist/PC5-OS-Setup.exe
+
+      - name: Publish the release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: shell/dist/PC5-OS-Setup.exe
+          generate_release_notes: true

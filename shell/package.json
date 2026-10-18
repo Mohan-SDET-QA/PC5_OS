@@ -1,0 +1,75 @@
+{
+  "name": "pc5-shell",
+  "productName": "PC5Shell",
+  "version": "0.1.0",
+  "description": "PC5 OS: a PS5-style console shell that replaces the Windows desktop",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron . --dev",
+    "demo": "electron . --dev --demo",
+    "build:helper": "powershell -ExecutionPolicy Bypass -File helper/build-helper.ps1",
+    "dist": "npm run build:helper && electron-builder --win dir",
+    "test": "node test/steam-shortcuts.test.js && node test/installs.test.js",
+    "installer": "npm run build:helper && electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "com.pc5.shell",
+    "productName": "PC5Shell",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "webapp-preload.js",
+      "src/**",
+      "renderer/**",
+      "overlay-preload.js"
+    ],
+    "extraResources": [
+      {
+        "from": "helper/bin",
+        "to": "helper",
+        "filter": [
+          "*.exe",
+          "*.ps1"
+        ]
+      },
+      {
+        "from": "build/icon.ico",
+        "to": "icon.ico"
+      }
+    ],
+    "win": {
+      "target": "dir",
+      "signAndEditExecutable": false,
+      "icon": "build/icon.ico"
+    },
+    "npmRebuild": false,
+    "copyright": "PC5 OS",
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "PC5 OS",
+      "uninstallDisplayName": "PC5 OS",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "PC5-OS-Setup.exe",
+      "include": "build/installer.nsh"
+    },
+    "publish": null
+  },
+  "dependencies": {
+    "webtorrent": "3.0.21"
+  },
+  "author": "PC5 OS"
+}

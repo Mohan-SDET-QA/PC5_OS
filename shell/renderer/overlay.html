@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'">
+  <title>PC5 Overlay</title>
+  <style>
+    @font-face { font-family: 'PC5 Sans'; src: url('fonts/Inter-Variable.woff2') format('woff2'); font-weight: 100 900; }
+    html, body { margin: 0; background: transparent; overflow: hidden; font-family: 'PC5 Sans', 'Segoe UI', sans-serif; color: #fff; user-select: none; }
+    .card { margin: 6px; padding: 10px 14px; border-radius: 14px; background: rgba(8, 10, 18, .72); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1); backdrop-filter: blur(10px);
+      display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; font-size: 13px; font-variant-numeric: tabular-nums; }
+    .k { color: rgba(255, 255, 255, .62); font-weight: 600; letter-spacing: .06em; font-size: 11px; }
+    .bar { height: 5px; border-radius: 3px; background: rgba(47, 123, 255, .22); overflow: hidden; }
+    .bar i { display: block; height: 100%; width: 0; border-radius: 3px; background: #4d8dff; transition: width .5s; }
+    .bar i.warn { background: #fab219; }
+    .bar i.crit { background: #d03b3b; }
+    .v { font-weight: 650; min-width: 74px; text-align: right; }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <span class="k">CPU</span><span class="bar"><i id="b-cpu"></i></span><span class="v" id="v-cpu">—</span>
+    <span class="k">GPU</span><span class="bar"><i id="b-gpu"></i></span><span class="v" id="v-gpu">—</span>
+    <span class="k">RAM</span><span class="bar"><i id="b-ram"></i></span><span class="v" id="v-ram">—</span>
+    <span class="k">VRAM</span><span class="bar"><i id="b-vram"></i></span><span class="v" id="v-vram">—</span>
+  </div>
+  <script src="js/overlay.js"></script>
+</body>
+</html>
