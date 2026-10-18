@@ -1,0 +1,80 @@
+{
+  "presets": {
+    "light": {
+      "title": "Light",
+      "desc": "Removes ads and the obvious extras. Everything else stays.",
+      "items": ["apps.news", "apps.copilot", "apps.help", "tw.ads", "tw.telemetry", "tw.reboot", "tw.bitlocker", "tw.gamemode", "inst.steam", "inst.7zip"]
+    },
+    "balanced": {
+      "title": "Balanced",
+      "desc": "The recommended console setup: no clutter, every game still works.",
+      "items": ["apps.news", "apps.copilot", "apps.help", "apps.office", "apps.casual", "apps.utilities", "apps.phone", "apps.extras",
+        "cap.legacy", "tw.ads", "tw.telemetry", "tw.reboot", "tw.bitlocker", "tw.gamemode", "tw.onedrive", "tw.lockscreen", "tw.uac",
+        "inst.steam", "inst.7zip"]
+    },
+    "minimal": {
+      "title": "Minimal",
+      "desc": "As small as Windows gets while staying a normal, updatable Windows.",
+      "items": ["apps.news", "apps.copilot", "apps.help", "apps.office", "apps.casual", "apps.utilities", "apps.phone", "apps.extras", "apps.media",
+        "cap.legacy", "cap.extras", "feat.recall", "feat.printing", "tw.ads", "tw.telemetry", "tw.reboot", "tw.bitlocker", "tw.gamemode",
+        "tw.onedrive", "tw.lockscreen", "tw.uac", "tw.search", "inst.steam", "inst.7zip"]
+    }
+  },
+  "groups": [
+    {
+      "id": "apps",
+      "title": "Preinstalled apps",
+      "items": [
+        { "id": "apps.news", "title": "News, Weather and Bing Search", "appx": ["Microsoft.BingNews", "Microsoft.BingWeather", "Microsoft.BingSearch"] },
+        { "id": "apps.copilot", "title": "Copilot", "appx": ["Microsoft.Copilot", "Microsoft.Windows.Ai.Copilot", "Microsoft.549981C3F5F10"] },
+        { "id": "apps.help", "title": "Get Help, Tips and Feedback Hub", "appx": ["Microsoft.GetHelp", "Microsoft.Getstarted", "Microsoft.WindowsFeedbackHub"] },
+        { "id": "apps.office", "title": "Microsoft 365, Outlook, Teams and To Do", "appx": ["Microsoft.MicrosoftOfficeHub", "Microsoft.OutlookForWindows", "microsoft.windowscommunicationsapps", "MSTeams", "Microsoft.Todos", "Microsoft.People"] },
+        { "id": "apps.casual", "title": "Solitaire and Clipchamp", "appx": ["Microsoft.MicrosoftSolitaireCollection", "Clipchamp.Clipchamp"] },
+        { "id": "apps.utilities", "title": "Alarms, Camera, Maps, Sound Recorder, Sticky Notes and Journal", "appx": ["Microsoft.WindowsAlarms", "Microsoft.WindowsCamera", "Microsoft.WindowsMaps", "Microsoft.WindowsSoundRecorder", "Microsoft.MicrosoftStickyNotes", "Microsoft.MicrosoftJournal"] },
+        { "id": "apps.phone", "title": "Phone Link", "appx": ["Microsoft.YourPhone"] },
+        { "id": "apps.extras", "title": "Family, Quick Assist, Power Automate and Dev Home", "appx": ["MicrosoftCorporationII.MicrosoftFamily", "MicrosoftCorporationII.QuickAssist", "Microsoft.PowerAutomateDesktop", "Microsoft.Windows.DevHome"] },
+        { "id": "apps.media", "title": "Media Player and Movies & TV", "desc": "PC5 has its own player for videos and music.", "appx": ["Microsoft.ZuneMusic", "Microsoft.ZuneVideo"] },
+        { "id": "apps.xbox", "title": "Xbox app, Game Bar and Microsoft Store", "warn": "Game Pass and Microsoft Store games stop working.", "appx": ["Microsoft.GamingApp", "Microsoft.XboxGamingOverlay", "Microsoft.XboxIdentityProvider", "Microsoft.XboxSpeechToTextOverlay", "Microsoft.Xbox.TCUI", "Microsoft.WindowsStore", "Microsoft.StorePurchaseApp"] }
+      ]
+    },
+    {
+      "id": "features",
+      "title": "Windows features",
+      "items": [
+        { "id": "cap.legacy", "title": "Internet Explorer mode, WordPad, Steps Recorder and Math Input", "capabilities": ["Browser.InternetExplorer", "Microsoft.Windows.WordPad", "App.StepsRecorder", "MathRecognizer"] },
+        { "id": "cap.extras", "title": "Handwriting, speech and OCR extras", "desc": "Keeps your display language.", "capabilities": ["Language.Handwriting", "Language.Speech", "Language.TextToSpeech", "Hello.Face"] },
+        { "id": "feat.recall", "title": "Recall", "features": ["Recall"] },
+        { "id": "feat.printing", "title": "XPS printer and fax", "features": ["Printing-XPSServices-Features", "FaxServicesClientPackage"] }
+      ]
+    },
+    {
+      "id": "tweaks",
+      "title": "Console behaviour",
+      "items": [
+        { "id": "tw.ads", "title": "No ads, suggested apps or “finish setting up” screens", "tweak": "noAds" },
+        { "id": "tw.telemetry", "title": "Diagnostic data at the minimum", "tweak": "telemetry" },
+        { "id": "tw.reboot", "title": "No forced restarts while you play", "tweak": "noForcedReboot" },
+        { "id": "tw.bitlocker", "title": "No automatic drive encryption", "tweak": "noAutoBitLocker" },
+        { "id": "tw.gamemode", "title": "Game Mode on", "tweak": "gameMode" },
+        { "id": "tw.onedrive", "title": "Don't install OneDrive", "tweak": "noOneDrive" },
+        { "id": "tw.lockscreen", "title": "No lock screen", "tweak": "noLockScreen" },
+        { "id": "tw.search", "title": "No web results in Windows search", "tweak": "noWebSearch" },
+        { "id": "tw.uac", "title": "No permission pop-ups", "desc": "They need a mouse to answer.", "warn": "Programs you start get administrator rights without asking.", "tweak": "noUacPrompts" }
+      ]
+    },
+    {
+      "id": "install",
+      "title": "Installed on first start",
+      "items": [
+        { "id": "inst.steam", "title": "Steam", "download": "steam" },
+        { "id": "inst.7zip", "title": "7-Zip, to open game archives", "download": "7zip" },
+        { "id": "inst.epic", "title": "Epic Games Launcher", "download": "epic" }
+      ]
+    }
+  ],
+  "downloads": {
+    "steam": { "url": "https://cdn.cloudflare.steamstatic.com/client/installer/SteamSetup.exe", "file": "SteamSetup.exe" },
+    "7zip": { "url": "https://www.7-zip.org/a/7z2409-x64.exe", "file": "7zip-setup.exe" },
+    "epic": { "url": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi", "file": "EpicInstaller.msi" }
+  }
+}

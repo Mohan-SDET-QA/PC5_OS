@@ -18,10 +18,31 @@ const winsettings = require('./src/winsettings');
 const installs = require('./src/installs');
 const color = require('./src/color');
 const perf = require('./src/perf');
+const { createInstaller } = require('./src/installer');
 
 const isWin = process.platform === 'win32';
 const devMode = process.argv.includes('--dev');
 const demoMode = process.argv.includes('--demo') || !isWin;
+
+// Inside PC5 OS (or with console mode on) the console is the system shell.
+// Started any other way on Windows, the app opens the PC5 OS Installer.
+function regValue(key, name) {
+  if (!isWin) return null;
+  try {
+    const out = require('child_process').execFileSync('reg', ['query', key, '/v', name], { windowsHide: true, timeout: 5000 }).toString();
+    const m = new RegExp(`${name}\\s+REG_\\w+\\s+(.+)`).exec(out);
+    return m ? m[1].trim() : null;
+  } catch {
+    return null;
+  }
+}
+const isPC5OS = Boolean(regValue('HKLM\\SOFTWARE\\PC5OS', 'Version'));
+const runningAsShell = isPC5OS || /PC5Shell\.exe/i.test(regValue('HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon', 'Shell') || '');
+function startupMode(argv) {
+  if (argv.includes('--installer')) return 'installer';
+  if (argv.includes('--console') || !isWin || runningAsShell) return 'console';
+  return 'installer';
+}
 
 let mainWin = null;
 let quitting = false;
@@ -60,7 +81,8 @@ function createMainWindow() {
   mainWin.once('ready-to-show', () => mainWin.show());
   mainWin.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   // As the system shell, closing the window would leave a black screen.
-  mainWin.on('close', (e) => { if (!quitting && !devMode) e.preventDefault(); });
+  mainWin.on('close', (e) => { if (!quitting && !devMode && runningAsShell) e.preventDefault(); });
+  mainWin.on('closed', () => { mainWin = null; });
 
   // Lock down the browser <webview>: no Node, no preload, web pages only.
   mainWin.webContents.on('will-attach-webview', (_e, prefs, params) => {
@@ -421,21 +443,38 @@ async function installFromFile(file) {
   }
 }
 
+let consoleStarted = false;
+function startConsole() {
+  if (consoleStarted) { if (mainWin) bringHome(); else createMainWindow(); return; }
+  consoleStarted = true;
+  setupBrowserSession();
+  createMainWindow();
+  startInput();
+  const cfg0 = config.load();
+  if (cfg0.overlay) setOverlay({ on: true, position: cfg0.overlayPosition });
+  autostart().then(scanGameFolders);
+  setInterval(scanGameFolders, 2 * 60 * 1000);
+  globalShortcut.register('Control+Alt+H', bringHome);
+}
+
+let installer = null;
+function launch(argv) {
+  if (startupMode(argv) === 'installer') installer.open();
+  else startConsole();
+}
+
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
-  app.on('second-instance', bringHome);
+  app.on('second-instance', (_e, argv) => {
+    if (argv.includes('--installer') || (!consoleStarted && startupMode(argv) === 'installer')) installer.open();
+    else startConsole();
+  });
   app.whenReady().then(() => {
     registerIpc();
-    setupBrowserSession();
-    createMainWindow();
-    startInput();
     winsettings.setHelperPath(helperPath('PC5System.exe'));
-    const cfg0 = config.load();
-    if (cfg0.overlay) setOverlay({ on: true, position: cfg0.overlayPosition });
-    autostart().then(scanGameFolders);
-    setInterval(scanGameFolders, 2 * 60 * 1000);
-    globalShortcut.register('Control+Alt+H', bringHome);
+    installer = createInstaller({ demo: demoMode && process.argv.includes('--demo'), devMode, winsettings, onOpenConsole: startConsole });
+    launch(process.argv);
   });
   app.on('before-quit', () => {
     quitting = true;

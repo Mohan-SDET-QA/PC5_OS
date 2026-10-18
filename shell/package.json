@@ -1,7 +1,7 @@
 {
   "name": "pc5-shell",
   "productName": "PC5Shell",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "PC5 OS: a PS5-style console shell that replaces the Windows desktop",
   "main": "main.js",
   "scripts": {
@@ -9,8 +9,9 @@
     "demo": "electron . --dev --demo",
     "build:helper": "powershell -ExecutionPolicy Bypass -File helper/build-helper.ps1",
     "dist": "npm run build:helper && electron-builder --win dir",
-    "test": "node test/steam-shortcuts.test.js && node test/installs.test.js",
-    "installer": "npm run build:helper && electron-builder --win nsis"
+    "test": "node test/steam-shortcuts.test.js && node test/installs.test.js && node test/installer-demo.test.js",
+    "installer": "npm run build:helper && electron-builder --win nsis",
+    "installer-demo": "electron . --dev --demo --installer"
   },
   "devDependencies": {
     "electron": "33.2.1",
@@ -28,7 +29,8 @@
       "webapp-preload.js",
       "src/**",
       "renderer/**",
-      "overlay-preload.js"
+      "overlay-preload.js",
+      "installer-preload.js"
     ],
     "extraResources": [
       {
@@ -42,6 +44,17 @@
       {
         "from": "build/icon.ico",
         "to": "icon.ico"
+      },
+      {
+        "from": "../windows",
+        "to": "windows",
+        "filter": [
+          "engine/*.ps1",
+          "engine/*.psm1",
+          "engine/*.json",
+          "scripts/*",
+          "autounattend.template.xml"
+        ]
       }
     ],
     "win": {
@@ -57,7 +70,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": "always",
       "createStartMenuShortcut": true,
-      "shortcutName": "PC5 OS",
+      "shortcutName": "PC5 OS Installer",
       "uninstallDisplayName": "PC5 OS",
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",

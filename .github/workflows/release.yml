@@ -12,6 +12,7 @@ on:
     tags: ['v*']
     paths:
       - 'shell/**'
+      - 'windows/**'
       - '.github/workflows/release.yml'
   workflow_dispatch:
 

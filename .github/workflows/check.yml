@@ -14,5 +14,8 @@ jobs:
       - name: Shell tests
         working-directory: shell
         run: npm ci --ignore-scripts && npm test
+      - name: Install engine unit tests
+        shell: pwsh
+        run: ./windows/engine/tests/engine.tests.ps1
       - name: Website build
         run: npm ci --prefix web && npm run build --prefix web

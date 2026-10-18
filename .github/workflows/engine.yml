@@ -1,0 +1,51 @@
+# Tests the PC5 OS install engine on real Windows:
+#   unit  the engine's logic under Windows PowerShell 5.1 (what users run) and PowerShell 7
+#   e2e   a real build from a Windows 11 ISO: installing into a new partition on a
+#         virtual disk, and creating a PC5 OS ISO
+name: Install engine
+
+on:
+  push:
+    paths:
+      - 'windows/**'
+      - '.github/workflows/engine.yml'
+  workflow_dispatch:
+    inputs:
+      iso_url:
+        description: 'Direct link to a Windows 10/11 x64 ISO (default: the Microsoft evaluation ISO)'
+        required: false
+
+jobs:
+  unit:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests (Windows PowerShell 5.1)
+        shell: powershell
+        run: ./windows/engine/tests/engine.tests.ps1
+      - name: Unit tests (PowerShell 7)
+        shell: pwsh
+        run: ./windows/engine/tests/engine.tests.ps1
+      - name: What the installer sees on this PC
+        shell: powershell
+        run: ./windows/engine/pc5-engine.ps1 -Command targets
+
+  e2e:
+    needs: unit
+    runs-on: windows-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [partition, iso]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free space
+        shell: powershell
+        run: Get-Volume | Where-Object DriveLetter | Format-Table DriveLetter, FileSystemLabel, @{n='FreeGB';e={[int]($_.SizeRemaining/1GB)}}, @{n='SizeGB';e={[int]($_.Size/1GB)}}
+      - name: Download a Windows 11 ISO
+        shell: powershell
+        run: ./windows/engine/tests/get-test-iso.ps1 -Out C:\pc5-iso\windows.iso -Url '${{ inputs.iso_url }}'
+      - name: Build PC5 OS (${{ matrix.target }})
+        shell: powershell
+        run: ./windows/engine/tests/e2e.ps1 -Iso C:\pc5-iso\windows.iso -Target ${{ matrix.target }}

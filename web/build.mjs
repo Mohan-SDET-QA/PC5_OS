@@ -64,6 +64,25 @@ page = page.replace(/content="default-src[^"]*"/, `content="default-src 'self'; 
 write('play/index.html', page);
 for (const f of fs.readdirSync(path.join(renderer, 'fonts'))) copy(path.join(renderer, 'fonts', f), `play/fonts/${f}`);
 
+// ---------------------------------------------------------------- /install/ (the installer, on its demo engine)
+{
+  const ihtml = fs.readFileSync(path.join(renderer, 'installer.html'), 'utf8');
+  const iscripts = [...ihtml.matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1]);
+  const ijs = (await transform(`window.PC5_VERSION=${JSON.stringify(version)};\n` + iscripts.map((s) => `;${fs.readFileSync(path.join(renderer, s), 'utf8')}\n`).join(''), { minify: true, target: 'es2021', legalComments: 'none', charset: 'utf8' })).code;
+  const icss = (await transform(fs.readFileSync(path.join(renderer, 'css', 'installer.css'), 'utf8'), { loader: 'css', minify: true, legalComments: 'none' })).code;
+  const ijsName = `assets/installer.${hash(ijs)}.js`;
+  const icssName = `css/installer.${hash(icss)}.css`;
+  write(`install/${ijsName}`, ijs);
+  write(`install/${icssName}`, icss);
+  write('install/index.html', ihtml
+    .replace(/\s*<script src="[^"]+"><\/script>/g, '')
+    .replace('<link rel="stylesheet" href="css/installer.css">', `<link rel="stylesheet" href="${icssName}">\n  <link rel="icon" href="/icon.png">\n  <meta name="description" content="Try the PC5 OS Installer in your browser. Nothing is installed.">`)
+    .replace('</body>', `  <script src="${ijsName}"></script>\n</body>`)
+    .replace(/content="default-src[^"]*"/, `content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'; connect-src 'self'"`));
+  copy(path.join(here, '..', 'windows', 'engine', 'strip-catalog.json'), 'install/strip-catalog.json');
+  for (const f of fs.readdirSync(path.join(renderer, 'fonts'))) copy(path.join(renderer, 'fonts', f), `install/fonts/${f}`);
+}
+
 // ---------------------------------------------------------------- / (landing page)
 const size = site.installerSize || '';
 const download = site.downloadUrl || '#install';
@@ -81,4 +100,4 @@ const rootConfig = JSON.parse(fs.readFileSync(path.join(here, '..', 'vercel.json
 write('vercel.json', JSON.stringify({ cleanUrls: rootConfig.cleanUrls, trailingSlash: rootConfig.trailingSlash, headers: rootConfig.headers }, null, 2));
 
 const total = (dir) => fs.readdirSync(dir, { withFileTypes: true }).reduce((n, d) => n + (d.isDirectory() ? total(path.join(dir, d.name)) : fs.statSync(path.join(dir, d.name)).size), 0);
-console.log(`Built web/dist (${(total(out) / 1e6).toFixed(1)} MB): / landing page, /play/ live preview.`);
+console.log(`Built web/dist (${(total(out) / 1e6).toFixed(1)} MB): / landing page, /play/ console preview, /install/ installer preview.`);

@@ -65,23 +65,26 @@
     </section>
 
     <section id="install" class="install">
-      <h2>Install in three steps</h2>
-      <ol class="steps">
-        <li><span>1</span><div><h3>Download</h3><p>Get <b>PC5-OS-Setup.exe</b> with the button above.</p></div></li>
-        <li><span>2</span><div><h3>Run Setup</h3><p>Double-click it. If Windows says <i>“Windows protected your PC”</i>, choose <b>More info → Run anyway</b>. That message appears for any new app that isn't code-signed yet.</p></div></li>
-        <li><span>3</span><div><h3>Pick how it starts</h3><p><b>Console mode</b> starts PC5 instead of the desktop when you sign in. <b>App mode</b> opens it like any other app. Change it any time in Settings → System.</p></div></li>
+      <h2>Install in four steps</h2>
+      <ol class="steps four">
+        <li><span>1</span><div><h3>Get Windows</h3><p>Download the free <b>Windows 11 ISO</b> from <a href="https://www.microsoft.com/software-download/windows11" rel="noopener">microsoft.com</a> ("Download Windows 11 Disk Image").</p></div></li>
+        <li><span>2</span><div><h3>Run the PC5 OS Installer</h3><p>Download and open <b>PC5-OS-Setup.exe</b>. If Windows says <i>“Windows protected your PC”</i>, choose <b>More info → Run anyway</b> (the app isn't code-signed yet).</p></div></li>
+        <li><span>3</span><div><h3>Choose where</h3><p><b>Next to Windows</b> on its own partition (nothing is deleted), on a <b>USB drive</b> for another PC, or as an <b>ISO</b>. Pick how much to strip.</p></div></li>
+        <li><span>4</span><div><h3>Restart into PC5 OS</h3><p>The boot menu now lists <b>PC5 OS</b>. The first start sets Windows up, then the console opens with your controller ready.</p></div></li>
       </ol>
       <div class="req">
-        <div><h3>You need</h3><p>Windows 10 or 11 (64-bit) · 4 GB RAM · a controller (optional: keyboard and mouse work too)</p></div>
-        <a class="btn primary" href="{{DOWNLOAD_URL}}">Download PC5 OS</a>
+        <div><h3>You need</h3><p>A 64-bit Windows 10 or 11 PC that starts in UEFI mode · 60 GB free on a drive · your Windows licence · a controller</p></div>
+        <div class="req-actions"><a class="btn" href="/install/">Try the installer</a><a class="btn primary" href="{{DOWNLOAD_URL}}">Download PC5 OS</a></div>
       </div>
     </section>
 
     <section id="faq" class="faq">
       <h2>Questions</h2>
-      <details><summary>Does it replace Windows?</summary><p>No. PC5 OS runs on top of your existing Windows. Your files, apps and games stay exactly where they are.</p></details>
-      <details><summary>How do I get back to the normal desktop?</summary><p>Settings → System → <b>Desktop Mode</b> opens the desktop right away (the PS button brings you back). <b>Switch to Windows</b> signs you in to the regular desktop until you choose to return.</p></details>
-      <details><summary>How do I uninstall it?</summary><p>Windows Settings → Apps → PC5 OS → Uninstall. If console mode was on, the uninstaller switches your PC back to the normal desktop.</p></details>
+      <details><summary>Does it replace my Windows?</summary><p>No. Installed next to Windows, PC5 OS is a separate, stripped-down Windows on its own partition. Each time the PC starts you choose PC5 OS or your usual Windows, and your files, apps and games stay where they are.</p></details>
+      <details><summary>What does "stripped down" remove?</summary><p>You choose: ads and suggestions, News, Copilot, Office and Teams installers, Phone Link, OneDrive, old extras like Internet Explorer mode, and more. Steam and 7-Zip are added. Everything removed can be reinstalled later, and PC5 OS still gets Windows updates.</p></details>
+      <details><summary>Is my Windows licence OK?</summary><p>PC5 OS is built from your own Windows ISO. On a PC that already runs Windows 10 or 11, the same edition normally activates by itself.</p></details>
+      <details><summary>How do I get back to my usual Windows?</summary><p>In PC5 OS: Settings → System → <b>Restart into another OS</b>. Or pick Windows in the boot menu when the PC starts. Inside PC5 OS, <b>Desktop Mode</b> also opens the full desktop with the controller as a mouse.</p></details>
+      <details><summary>How do I remove PC5 OS?</summary><p>From your usual Windows, open the PC5 OS Installer and choose <b>Remove</b> next to PC5 OS: the partition and boot entry are deleted and the space goes back to your drive.</p></details>
       <details><summary>Do my PlayStation controllers work in every game?</summary><p>PC5 adds the games you install yourself to Steam, so Steam Input translates your PlayStation controller for games that only understand Xbox controllers.</p></details>
       <details><summary>Is it free?</summary><p>Yes. Store games are bought or claimed through their own stores (Steam, Epic, GOG).</p></details>
     </section>

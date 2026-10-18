@@ -721,22 +721,8 @@
     if (Browser.active()) Browser.close();
     showView('games', { focus: false });
     Nav.focus($('#game-row [data-nav]'));
-    setTimeout(firstRun, 900);
   }
 
-  // First launch after Setup: ask once how PC5 should start.
-  function firstRun() {
-    if (S.cfg.setupDone || S.env.platform !== 'win32') return;
-    const choose = (on) => async () => {
-      try { await api.winset('setConsoleMode', on); } catch (err) { toast(err.message, 'alert'); }
-      S.cfg = await api.setConfig({ setupDone: true });
-      toast(on ? 'Done. PC5 starts the next time you sign in.' : 'Done. Open PC5 from the Start menu any time.', 'check');
-    };
-    menu('Welcome to PC5', [
-      ['Console mode', choose(true), { desc: 'PC5 starts instead of the Windows desktop when you sign in, like a console. Recommended for a TV.' }],
-      ['App mode', choose(false), { desc: 'Keep the normal Windows desktop and open PC5 from the Start menu or the desktop icon.' }],
-    ], { subtitle: 'How should PC5 start? You can change this later in Settings → System.' });
-  }
 
   function cycleTab(step) {
     const i = TABS.indexOf(S.lastTab);
@@ -879,22 +865,8 @@
     setTimeout(() => { $('#splash').hidden = true; }, 700);
     showView('games', { focus: false });
     Nav.focus($('#game-row [data-nav]'));
-    setTimeout(firstRun, 900);
   }
 
-  // First launch after Setup: ask once how PC5 should start.
-  function firstRun() {
-    if (S.cfg.setupDone || S.env.platform !== 'win32') return;
-    const choose = (on) => async () => {
-      try { await api.winset('setConsoleMode', on); } catch (err) { toast(err.message, 'alert'); }
-      S.cfg = await api.setConfig({ setupDone: true });
-      toast(on ? 'Done. PC5 starts the next time you sign in.' : 'Done. Open PC5 from the Start menu any time.', 'check');
-    };
-    menu('Welcome to PC5', [
-      ['Console mode', choose(true), { desc: 'PC5 starts instead of the Windows desktop when you sign in, like a console. Recommended for a TV.' }],
-      ['App mode', choose(false), { desc: 'Keep the normal Windows desktop and open PC5 from the Start menu or the desktop icon.' }],
-    ], { subtitle: 'How should PC5 start? You can change this later in Settings → System.' });
-  }
 
   Pad.on((action) => {
     if (S.splash) {

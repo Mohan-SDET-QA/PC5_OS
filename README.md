@@ -179,6 +179,41 @@ Everything you see is original:
 
 No Sony logos, the PS5 system font, theme artwork or sounds are included. The ✕ ○ □ △ symbols appear only as button prompts for the controller in your hand.
 
+## Install PC5 OS: the installer
+
+This is how a user gets PC5 OS onto a PC. There's nothing to build or type:
+
+1. **Get Windows:** download the Windows 11 ISO from [microsoft.com/software-download/windows11](https://www.microsoft.com/software-download/windows11) (free).
+2. **Open the PC5 OS Installer:** Setup opens it; afterwards it's on the desktop. Choose one of:
+   - **Install next to Windows** (recommended): PC5 OS gets its own partition and the boot menu offers PC5 OS or Windows. No USB stick needed.
+   - **Make an install USB:** a UEFI USB stick that installs PC5 OS on any PC, including a whole-disk console PC.
+   - **Save a PC5 OS ISO:** for virtual machines, Ventoy, or writing to USB later.
+3. **Follow the five steps:**
+   - **Windows:** drop the ISO and pick the edition.
+   - **Strip down:** choose Light, Balanced or Minimal, or tick items yourself.
+   - **Where:** pick a drive and a size, with a picture of the disk before and after.
+   - **Account:** the player name for automatic sign-in.
+   - **Review:** confirm the changes, then install.
+4. **Restart into PC5 OS:** the first start sets Windows up for a few minutes, then the console opens.
+
+What the installer does, in the engine (`windows/engine/PC5Engine.psm1`):
+
+| Step | Next to Windows | USB / ISO |
+|---|---|---|
+| Room | shrinks the chosen drive (keeps 20 GB free for it) or uses unallocated space, makes an NTFS partition | wipes and formats the USB (FAT32, GPT) / temporary folder |
+| Windows | `DISM /Apply-Image` of the chosen edition straight onto the partition | exports the edition, mounts it |
+| Strip | removes the chosen provisioned apps, capabilities and features; applies the console settings | same, inside the image |
+| PC5 | copies the installed PC5 app, sets it as the shell for new users, adds the first-boot script, Steam and 7-Zip, and `unattend.xml` (local account, auto sign-in, no setup screens) | same, with `autounattend.xml` on the media; optional TPM/Secure Boot bypass |
+| Boot | `bcdboot /d` adds **PC5 OS** to the existing boot menu without changing the default. BitLocker is paused for two restarts and Fast Startup is turned off | install.wim is split for FAT32, or the ISO is written (oscdimg if installed, otherwise Windows' built-in IMAPI) |
+
+Every step that changes a disk registers an undo, so a failure or **Cancel** puts the drive back the way it was. The installer's home screen lists PC5 OS installs on this PC, with **Restart into PC5 OS** and **Remove** (deletes the partition and boot entry, and gives the space back).
+
+The engine runs elevated (one Windows permission prompt) and talks to the window over a private loopback connection with a one-time token. It can also be run directly: `windows\engine\pc5-engine.ps1 -Command targets`.
+
+Requirements for "next to Windows": a UEFI PC with a GPT disk, and 60 GB free on a drive. A legacy BIOS PC can still use a USB stick.
+
+`windows/build-iso.ps1` is the older command-line ISO builder; the installer replaces it for normal use.
+
 ## Publish it: GitHub + Vercel
 
 PC5 OS is open source (MIT, see `LICENSE`). Users never need VS Code or Node.js. They get a website and an installer:
@@ -214,10 +249,9 @@ To deploy from your PC without GitHub: `cd web`, `npm install`, `npm run deploy`
 
 ### What the user's Setup does
 
-- installs per user, with no admin prompt, and lets them pick the folder;
-- adds Start-menu and desktop shortcuts and opens PC5 when it finishes;
-- on first launch, asks **Console mode** (PC5 starts instead of the desktop at sign-in) or **App mode** (a normal app). They can change it in Settings → System → Console mode;
-- Windows Settings → Apps → PC5 OS → Uninstall removes it and, if console mode was on, puts the normal desktop back.
+- installs the **PC5 OS Installer** per user, with no admin prompt, and opens it when Setup finishes;
+- adds a desktop and Start-menu shortcut for the installer, plus **PC5 OS Console** to try the console on this Windows;
+- Windows Settings → Apps → PC5 OS → Uninstall removes the app and, if console mode was on, puts the normal desktop back.
 
 The installer isn't code-signed, so SmartScreen shows "Windows protected your PC" and users click *More info → Run anyway*. The website explains this. Open-source projects can get free signing through programmes such as SignPath Foundation.
 
