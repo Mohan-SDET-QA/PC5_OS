@@ -641,7 +641,23 @@ public static class PC5IsoWriter {
         catch { Write-PC5Log 'This Windows can only add one boot loader: the ISO will start on UEFI PCs only.' 'warn'; $fsi.BootImageOptions = $options[-1] }
     } elseif ($options.Count -eq 1) { $fsi.BootImageOptions = $options[0] }
     $result = $fsi.CreateResultImage()
-    [PC5IsoWriter]::Save($OutFile, $result.ImageStream, $result.BlockSize, $result.TotalBlocks)
+    try {
+        [PC5IsoWriter]::Save($OutFile, $result.ImageStream, $result.BlockSize, $result.TotalBlocks)
+    } finally {
+        # IMAPI keeps every source file open until its objects are released.
+        foreach ($o in @($result, $fsi) + $options) { try { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($o) } catch { } }
+        [gc]::Collect(); [gc]::WaitForPendingFinalizers()
+    }
+}
+
+# Deletes a folder, retrying while Windows still holds files in it.
+function Remove-PC5Folder([string] $Path) {
+    for ($i = 0; $i -lt 10; $i++) {
+        if (-not (Test-Path -LiteralPath $Path)) { return $true }
+        try { Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction Stop } catch { [gc]::Collect(); Start-Sleep -Seconds 2 }
+    }
+    if (Test-Path -LiteralPath $Path) { Write-PC5Log "Couldn't delete the temporary folder $Path. You can delete it yourself." 'warn'; return $false }
+    return $true
 }
 
 # ------------------------------------------------------------------ USB
@@ -795,7 +811,7 @@ function Invoke-PC5MediaBuild([object] $Spec, [object[]] $Items, [object] $Catal
     $wim = Join-Path $work 'install.wim'
     New-Item -ItemType Directory -Force -Path $mediaDir, $mountDir | Out-Null
     $w = $work
-    Push-PC5Undo 'delete temporary files' { Remove-Item -LiteralPath $w -Recurse -Force -ErrorAction SilentlyContinue }.GetNewClosure()
+    Push-PC5Undo 'delete temporary files' { [void](Remove-PC5Folder $w) }.GetNewClosure()
     Write-PC5Log "Temporary files: $work"
 
     Start-PC5Step 'copy'
@@ -851,7 +867,8 @@ function Invoke-PC5MediaBuild([object] $Spec, [object[]] $Items, [object] $Catal
     }
 
     Start-PC5Step 'finish'
-    Remove-Item -LiteralPath $work -Recurse -Force -ErrorAction SilentlyContinue
+    Get-WindowsImage -Mounted -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "$work*" } | ForEach-Object { Invoke-PC5Dism "/Unmount-Image /MountDir:$(Format-PC5Arg $_.Path) /Discard" }
+    [void](Remove-PC5Folder $work)
     Set-PC5StepProgress 100
     return @{ target = $Spec.target; output = $out; removed = $removed }
 }
