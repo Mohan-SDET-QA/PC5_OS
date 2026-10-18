@@ -1,11 +1,18 @@
 # Builds PC5-OS-Setup.exe on a Windows machine and publishes it as a GitHub Release.
-# Start it by pushing a version tag:   git tag v0.1.0 && git push origin v0.1.0
-# (or Actions → Build installer → Run workflow, which builds without publishing).
+#
+# Releasing: set "version" in shell/package.json (e.g. 0.2.0) and push to main.
+# If there's no release v<version> yet, this builds the installer, creates the
+# v<version> tag and release, and attaches PC5-OS-Setup.exe. Pushing a v* tag
+# yourself works too. Actions → Build installer → Run workflow builds on demand.
 name: Build installer
 
 on:
   push:
+    branches: [main]
     tags: ['v*']
+    paths:
+      - 'shell/**'
+      - '.github/workflows/release.yml'
   workflow_dispatch:
 
 permissions:
@@ -19,6 +26,23 @@ jobs:
         working-directory: shell
     steps:
       - uses: actions/checkout@v4
+
+      - name: Work out the version
+        id: version
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="v$(node -p "require('./package.json').version")"
+          echo "tag=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          elif gh release view "$version" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "$version is already released; building without publishing."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/setup-node@v4
         with:
@@ -42,8 +66,11 @@ jobs:
           path: shell/dist/PC5-OS-Setup.exe
 
       - name: Publish the release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: steps.version.outputs.publish == 'true'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: PC5 OS ${{ github.ref_type == 'tag' && github.ref_name || steps.version.outputs.tag }}
           files: shell/dist/PC5-OS-Setup.exe
           generate_release_notes: true

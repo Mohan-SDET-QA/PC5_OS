@@ -201,12 +201,7 @@ git push -u origin main
 
 ### 2. Release the installer
 
-```powershell
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-The **Build installer** workflow (`.github/workflows/release.yml`) compiles the controller service and the installer on Windows and attaches `PC5-OS-Setup.exe` to a new release. For the next version, bump `"version"` in `shell/package.json` and push a new tag. To build on your own PC instead, double-click **`Build Installer.cmd`**.
+Releases are automatic. When `main` gets a `"version"` in `shell/package.json` that hasn't been released yet, the **Build installer** workflow (`.github/workflows/release.yml`) builds the controller service and the installer on Windows, creates the `v<version>` tag and release, and attaches `PC5-OS-Setup.exe`. For the next version, change `"version"` (for example to `0.2.0`) and push. Pushing a `v*` tag yourself also works. To build on your own PC instead, double-click **`Build Installer.cmd`**.
 
 ### 3. Turn the repo into a Vercel site
 
