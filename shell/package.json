@@ -1,7 +1,7 @@
 {
   "name": "pc5-shell",
   "productName": "PC5Shell",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "PC5 OS: a PS5-style console shell that replaces the Windows desktop",
   "main": "main.js",
   "scripts": {

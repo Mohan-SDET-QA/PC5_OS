@@ -357,17 +357,30 @@ Write `PC5OS.iso` to a USB stick with [Rufus](https://rufus.ie). Untick everythi
   - A screenshot is saved as a real PNG.
 - **Unit tests** (`npm test`): Steam shortcut writing, and the install tracker's registry parsing and "what got installed" logic.
 
-**Not tested yet, because it needs real Windows and real controllers:**
+**Tested on real Windows** (GitHub Actions, `.github/workflows/engine.yml`, on every change to `windows/`), using Microsoft's Windows 11 Enterprise evaluation ISO:
+- **Install next to Windows:** the engine applies Windows to a new partition on a virtual disk. All 17 checks pass, covering:
+  - the partition and the PC5 app files;
+  - the first-boot script, `unattend.xml` and the Steam download;
+  - every stripped app removed, the registry marker and console shell;
+  - a **PC5 OS** boot entry added without touching the running Windows or the default;
+  - **Remove** deleting the partition and the boot entry.
+- **Save a PC5 OS ISO:** the ISO is built with Windows' built-in writer, has one edition, boot files and `autounattend.xml`, and temporary files are cleaned up. Without the Windows ADK this ISO starts on UEFI PCs only.
+- **The installer's view of the PC:** firmware, drives, what can be shrunk and why (it correctly refuses a too-full drive and an MBR disk).
+- **Engine logic:** the unit tests pass under Windows PowerShell 5.1 and PowerShell 7.
+- **Helpers:** `PC5Input.exe` and `PC5System.exe` compile in the release build.
+
+**Not tested yet, because it needs a real PC and real controllers:**
+- Restarting into PC5 OS on real hardware and its first start, which runs Windows setup, `firstboot.ps1` and auto sign-in.
+- Writing a USB stick, since CI runners have no USB drives.
 - `PC5Input.exe` compiles on Windows, but PS4/PS5 HID reading, the global PS button and mouse mode haven't been tried with a real controller yet.
-- `PC5System.exe` (volume, output device, resolution) hasn't been compiled yet. This environment has no C# compiler, and here those settings use stand-in values.
+- `PC5System.exe` (volume, output device, resolution) compiles but hasn't been used on a real PC.
 - Running real installers, the desktop-mode switch, and Switch to Windows / Return to PC5.
 - Bluetooth pairing.
 - Wi-Fi.
 - The boot-menu switch.
-- The ISO build and first-boot scripts.
 - The Steam, Epic and GamerPower store feeds, which this environment's network blocks.
 
-Expect a round of fixes on the first real run. A Hyper-V VM is a safe place to try the ISO.
+Expect a round of fixes on the first real run. A Hyper-V VM (Generation 2) is a safe place to try the PC5 OS ISO first.
 
 ## Known limitations
 
